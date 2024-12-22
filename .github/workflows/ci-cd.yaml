@@ -1,0 +1,27 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: AKIAQ4NXQGQQZQ6DQQV2
+        aws-secret-access-key: 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
+        aws-region: us-west-2
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name eks-demo --region us-west-2
+
+    - name: Deploy to ArgoCD
+      run: |
+        kubectl apply -f kubernetes/argocd/application.yaml
